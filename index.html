@@ -1,0 +1,56 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1422"><link rel="manifest" href="manifest.webmanifest"><title>Sports Market Live — MLB Scores</title><style>
+:root{font-family:Inter,system-ui,Arial,sans-serif;color:#e8f0fa;background:#08111d}*{box-sizing:border-box}body{margin:0}header{padding:18px 22px;background:#101d30;border-bottom:1px solid #273b51;display:flex;align-items:center;justify-content:space-between;gap:10px}h1{font-size:22px;margin:0}small,.muted{color:#95a8bf}.brand{color:#62e5af;font-size:11px;letter-spacing:2px;font-weight:800}.tag{border:1px solid #3c556d;border-radius:20px;padding:6px 10px;font-size:12px;color:#e2b970}.ticker{overflow:hidden;background:#0c1b2a;border-bottom:1px solid #263b50;white-space:nowrap}.ticker-track{display:flex;width:max-content;animation:move 40s linear infinite}.ticker:hover .ticker-track{animation-play-state:paused}.tick{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-right:1px solid #2a4055;font-size:13px}.tick b{color:#7df0ba}.tick small{font-size:10px}@keyframes move{to{transform:translateX(-50%)}}main{max-width:1500px;margin:auto;padding:22px}.bar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.tabs{display:flex;gap:7px;flex-wrap:wrap}button,select{background:#17283b;border:1px solid #31475f;color:#e8f0fa;border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:600}button.active{background:#1d755a;border-color:#40c995;color:white}button:hover{border-color:#70deb6}.stats-summary{color:#99acc0;font-size:13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.game{border:1px solid #2b4157;border-radius:12px;background:#111f30;overflow:hidden}.game-top{display:flex;justify-content:space-between;background:#172a3e;padding:10px 14px;font-size:12px;color:#b7c8da}.live{color:#69e5aa;font-weight:700}.table{padding:12px 14px}.line{display:grid;grid-template-columns:76px 38px repeat(5,minmax(38px,1fr));gap:5px;align-items:center;text-align:right;font-size:13px;padding:8px 0}.line.head{color:#8fa4b9;font-size:10px;border-bottom:1px solid #2c4257}.line .team{text-align:left;font-weight:750}.score{color:#6de9ac;font-weight:800;font-size:18px}.line+.line:not(.head){border-top:1px solid #203449}.actions{display:flex;justify-content:space-between;align-items:center;padding:0 14px 12px;gap:8px}.actions button{font-size:12px;padding:7px 10px}.detail{padding:12px 14px;border-top:1px solid #30475e;background:#0c1928;font-size:13px;line-height:1.6}.detail p{margin:5px 0}.note{background:#172a3e;padding:10px;border-radius:8px;margin-top:8px}.footer{color:#8da2b6;font-size:12px;margin-top:20px;line-height:1.6}.status{font-size:12px;color:#a9bed1}a{color:#7eecc1}@media(max-width:900px){.grid{grid-template-columns:1fr}main{padding:12px}header{padding:14px}h1{font-size:18px}.line{grid-template-columns:60px 30px repeat(5,minmax(35px,1fr));gap:2px;font-size:12px}.score{font-size:16px}.table{padding:10px}.tick{padding:10px 15px}}@media(max-width:380px){.line{font-size:11px;grid-template-columns:49px 25px repeat(5,minmax(31px,1fr))}.line.head{font-size:9px}}
+</style></head><body><header><div><div class="brand">SPORTS MARKET LIVE</div><h1>Scoreboard Terminal</h1></div><span class="tag">● MLB LIVE SOURCE + DEMO</span></header><div class="ticker" aria-label="Scrolling demonstration scoreboard"><div class="ticker-track" id="ticker"></div></div><main><div class="bar"><div class="tabs" id="tabs"></div><div><span class="stats-summary" id="count"></span> <button id="pause">Pause ticker</button></div></div><div class="bar"><div class="status" id="feedstatus" role="status">MLB: loading…</div><button id="refresh">Refresh MLB scores</button></div><div class="grid" id="grid"></div><p class="footer"><strong>Data status:</strong> MLB scores and available H/ERR values are requested from the public MLB StatsAPI schedule endpoint, refreshed every 60 seconds while the page is open. MLB is an unofficial, unsupported public interface and may stop working; missing statistics show —. Other four leagues remain explicitly labeled fictional demos. No odds or betting features. TYDS = total yards; RYDS = rushing yards; PYDS = passing yards; TOV = turnovers; SK = defensive sacks; FG% = field-goal percentage; REB = rebounds; AST = assists; STL = steals; H = hits; XBH = extra-base hits; BB = walks; ERR = errors; K = strikeouts. Your browser must have internet access for live data.</p></main><script>
+const demos=[
+{l:'CFB',a:'TENN',b:'SC',x:21,y:17,p:'Q3 08:42',s:[[295,162,133,1,2],[271,91,180,2,1]],note:'Fictional scouting example: early-down rushing efficiency.'},
+{l:'CFB',a:'ORE',b:'ILL',x:28,y:14,p:'Q3 04:15',s:[[386,188,198,0,3],[254,109,145,2,1]],note:'Fictional scouting example: pass protection.'},
+{l:'NFL',a:'BUF',b:'MIA',x:24,y:20,p:'Q4 10:28',s:[[342,122,220,1,2],[317,88,229,2,1]],note:'Fictional scouting example: red-zone execution.'},
+{l:'NFL',a:'DAL',b:'PHI',x:13,y:17,p:'Q2 01:32',s:[[202,68,134,2,1],[225,112,113,0,2]],note:'Fictional scouting example: rushing production.'},
+{l:'CBB',a:'DUKE',b:'UNC',x:63,y:60,p:'2H 06:40',s:[[44,32,15,10,5],[41,28,12,13,6]],note:'Fictional scouting example: transition defense.'},
+{l:'NBA',a:'BOS',b:'NYK',x:87,y:82,p:'Q3 02:10',s:[[48,39,21,9,7],[46,35,18,12,5]],note:'Fictional scouting example: half-court shot quality.'},
+{l:'MLB',a:'LAD',b:'NYM',x:4,y:3,p:'BOT 7',s:[[9,3,6,0,7],[7,2,5,1,8]],note:'Fictional scouting example: bullpen usage.'}
+];
+const headers={CFB:['TYDS','RYDS','PYDS','TOV','SK'],NFL:['TYDS','RYDS','PYDS','TOV','SK'],CBB:['FG%','REB','AST','TOV','STL'],NBA:['FG%','REB','AST','TOV','STL'],MLB:['H','XBH','BB','ERR','K']};
+let active='ALL',mlb=[],mlbState='Loading',updated=null,paused=false;
+const tabs=document.getElementById('tabs'),grid=document.getElementById('grid'),ticker=document.getElementById('ticker');
+const esc=s=>String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function games(){return [...demos.filter(g=>g.l!=='MLB'),...(mlbState==='OK'?mlb:[{...demos.find(g=>g.l==='MLB'),demo:true}])];}
+function render(){
+ tabs.innerHTML=['ALL','CFB','NFL','CBB','NBA','MLB'].map(l=>`<button class="${active===l?'active':''}" data-league="${l}">${l}</button>`).join('');
+ tabs.querySelectorAll('button').forEach(b=>b.onclick=()=>{active=b.dataset.league;render()});
+ const list=games().filter(g=>active==='ALL'||g.l===active);
+ document.getElementById('count').textContent=`${list.length} games shown`;
+ grid.innerHTML=list.map(g=>{
+  const cols=headers[g.l],isLive=g.live===true;
+  const line=(name,score,vals)=>`<div class="line"><span class="team">${esc(name)}</span><span class="score">${esc(score)}</span>${vals.map((v,j)=>`<span>${v===null||v===undefined?'—':esc(v)+(cols[j]==='FG%'?'%':'')}</span>`).join('')}</div>`;
+  return `<article class="game"><div class="game-top"><span>${esc(g.l)} · ${isLive?'MLB DATA':'FICTIONAL DEMO'}</span><span class="live">${esc(g.p)}</span></div><div class="table"><div class="line head"><span>TEAM</span><span>PTS</span>${cols.map(h=>`<span title="${esc(h)}">${esc(h)}</span>`).join('')}</div>${line(g.a,g.x,g.s[0])}${line(g.b,g.y,g.s[1])}</div><div class="actions"><span class="status">${isLive?'MLB source · '+esc(updated||''):'Sample only'}</span><button aria-expanded="false" onclick="toggleDetail(this)">Scouting details ▾</button></div><div class="detail" hidden><strong>Game scouting notebook</strong><div class="note">${esc(g.note)}</div><p>${isLive?'Source: MLB StatsAPI; fields not supplied by feed show —.':'Source: fictional demonstration data.'}</p></div></article>`;
+ }).join('')||'<p class="status">No games listed for this league today.</p>';
+ const ticks=games().map(g=>`<span class="tick"><small>${esc(g.l)} ${esc(g.p)} ${g.live?'MLB':'DEMO'}</small><strong>${esc(g.a)} ${esc(g.x)}</strong>–<b>${esc(g.b)} ${esc(g.y)}</b></span>`).join('');
+ ticker.innerHTML=`<div class="ticker-track" style="animation-play-state:${paused?'paused':'running'}">${ticks}${ticks}</div>`;
+ document.getElementById('feedstatus').textContent=`MLB feed: ${mlbState}${updated?' · Checked '+updated:''}`;
+}
+window.toggleDetail=b=>{const d=b.closest('.game').querySelector('.detail');d.hidden=!d.hidden;b.setAttribute('aria-expanded',String(!d.hidden));b.textContent=d.hidden?'Scouting details ▾':'Hide details ▴'};
+document.getElementById('pause').onclick=()=>{paused=!paused;const t=ticker.querySelector('.ticker-track');if(t)t.style.animationPlayState=paused?'paused':'running';document.getElementById('pause').textContent=paused?'Resume ticker':'Pause ticker'};
+async function loadMLB(){
+ mlbState='Updating';render();
+ try{
+  const today=new Date(), date=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+  const u=`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${date}&hydrate=linescore`;
+  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),12000);
+  let res;try{res=await fetch(u,{signal:ctrl.signal,cache:'no-store'})}finally{clearTimeout(timeout)}
+  if(!res.ok)throw Error('HTTP '+res.status);
+  const payload=await res.json();
+  mlb=(payload.dates||[]).flatMap(d=>d.games||[]).map(g=>{
+   const away=g.teams?.away||{},home=g.teams?.home||{},ln=g.linescore||{};
+   const stats=side=>[ln.teams?.[side]?.hits??null,null,null,ln.teams?.[side]?.errors??null,null];
+   const status=g.status?.detailedState||'Scheduled',inning=ln.currentInning?`${ln.inningState==='Top'?'TOP':ln.inningState==='Bottom'?'BOT':''} ${ln.currentInning}`:status;
+   return {l:'MLB',a:away.team?.abbreviation||away.team?.name||'Away',b:home.team?.abbreviation||home.team?.name||'Home',x:away.score??'—',y:home.score??'—',p:inning,s:[stats('away'),stats('home')],note:'Live game information. Add your own scouting notes in the next version.',live:true};
+  });
+  mlbState='OK';updated=new Date().toLocaleTimeString();
+ }catch(e){mlbState='Unavailable ('+e.message+')';updated=new Date().toLocaleTimeString()}
+ render();
+}
+document.getElementById('refresh').onclick=loadMLB;
+render();loadMLB();setInterval(()=>{if(!document.hidden)loadMLB()},60000);
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
